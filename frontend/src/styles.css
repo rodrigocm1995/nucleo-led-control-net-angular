@@ -20,6 +20,7 @@
     --accent-green-glow: #00ff88;
     --accent-red: #ef4444;
     --accent-warning: #f59e0b;
+    --chart-line-color: #ef4444;
     
     --terminal-bg: rgba(7, 10, 19, 0.8);
     --terminal-border: rgba(0, 242, 254, 0.15);
@@ -917,6 +918,7 @@ body.light-mode {
     --accent-green-glow: #10b981;
     --accent-red: #dc2626;
     --accent-warning: #d97706;
+    --chart-line-color: #dc2626;
     
     --terminal-bg: rgba(249, 250, 251, 0.95);
     --terminal-border: rgba(13, 148, 136, 0.25);
@@ -1119,4 +1121,98 @@ body.light-mode .code-container .token.variable {
 body.light-mode .code-container .token.directive,
 body.light-mode .code-container .token.macro {
     color: #be185d !important;
+}
+
+/* ==========================================================================
+   LED State Real-time Graph (Oscilloscope)
+   ========================================================================== */
+.led-chart-container {
+    width: 100%;
+    max-width: 320px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+body.light-mode .led-chart-container {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.chart-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.chart-title {
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+}
+
+.chart-status {
+    font-family: var(--font-mono);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+body.light-mode .chart-status {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.chart-status.on {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+body.light-mode .chart-status.on {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.led-svg-chart {
+    width: 100%;
+    height: 90px;
+    background: rgba(7, 10, 19, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    overflow: visible;
+}
+
+body.light-mode .led-svg-chart {
+    background: rgba(243, 244, 246, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.chart-grid-line {
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 1;
+}
+
+body.light-mode .chart-grid-line {
+    stroke: rgba(0, 0, 0, 0.06);
+}
+
+.chart-label-text {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    fill: var(--text-muted);
+}
+
+.chart-stroke-line {
+    filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.4));
+}
+
+body.light-mode .chart-stroke-line {
+    filter: none;
 }

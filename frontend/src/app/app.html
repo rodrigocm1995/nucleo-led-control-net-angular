@@ -132,6 +132,42 @@
           <span class="led-state-label">{{ serialService.ledState() ? 'LED ENCENDIDO' : 'LED APAGADO' }}</span>
         </div>
 
+        <!-- Gráfica de estado del LED en tiempo real -->
+        <div class="led-chart-container">
+          <div class="chart-header-row">
+            <span class="chart-title">Historial de Estado (Osciloscopio)</span>
+            <span class="chart-status" [class.on]="serialService.ledState()">
+              {{ serialService.ledState() ? '1 (ON)' : '0 (OFF)' }}
+            </span>
+          </div>
+          <svg viewBox="0 0 300 80" class="led-svg-chart">
+            <defs>
+              <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--chart-line-color)" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="var(--chart-line-color)" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+            
+            <!-- Líneas de red de fondo (Grid) -->
+            <line x1="10" y1="20" x2="290" y2="20" class="chart-grid-line" stroke-dasharray="3,3" />
+            <line x1="10" y1="60" x2="290" y2="60" class="chart-grid-line" stroke-dasharray="3,3" />
+            
+            <!-- Etiquetas Y -->
+            <text x="5" y="23" class="chart-label-text">1</text>
+            <text x="5" y="63" class="chart-label-text">0</text>
+            
+            <!-- Relleno bajo la línea -->
+            @if (svgFillPath()) {
+              <path [attr.d]="svgFillPath()" fill="url(#chartGlow)" />
+            }
+            
+            <!-- Línea de trazo de la onda digital -->
+            @if (svgPath()) {
+              <path [attr.d]="svgPath()" fill="none" stroke="var(--chart-line-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chart-stroke-line" />
+            }
+          </svg>
+        </div>
+
         <div class="toggle-container">
           <span class="toggle-desc">Estado del Pin Físico ('1' / '0'):</span>
           <label class="switch" for="led-toggle">

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, inject, signal, effect, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, inject, signal, effect, ElementRef, ViewChild, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SerialService } from './services/serial.service';
@@ -12,7 +12,7 @@ declare var Prism: any; // Declarar Prism para coloreado de código C
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit, AfterViewInit {
+export class App implements OnInit, AfterViewInit, OnDestroy {
   // Inyección de servicios usando el patrón moderno de Angular
   public readonly serialService = inject(SerialService);
 
@@ -29,6 +29,74 @@ export class App implements OnInit, AfterViewInit {
 
   // Lista de velocidades estándar
   public readonly baudRates: number[] = [9600, 19200, 38400, 57600, 115200];
+
+  // Historial de puntos para la gráfica del LED
+  public readonly chartPoints = signal<{ time: number; state: number }[]>([]);
+  private chartIntervalId: any = null;
+
+  // Genera el path del trazo de la señal del osciloscopio
+  public readonly svgPath = computed(() => {
+    const points = this.chartPoints();
+    if (points.length === 0) {
+      return '';
+    }
+    
+    const now = Date.now();
+    const cutOff = now - 15000; // Ventana de 15 segundos
+    
+    const width = 300;
+    const height = 80;
+    const padding = 10;
+    
+    const getX = (time: number) => {
+      if (time <= cutOff) return padding;
+      return padding + (width - 2 * padding) * ((time - cutOff) / 15000);
+    };
+    
+    const getY = (state: number) => {
+      // 1 (ON) arriba, 0 (OFF) abajo
+      return state === 1 ? padding + 10 : height - padding - 10;
+    };
+    
+    let path = '';
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const x = getX(p.time);
+      const y = getY(p.state);
+      
+      if (i === 0) {
+        path += `M ${x} ${y}`;
+      } else {
+        const prevY = getY(points[i-1].state);
+        path += ` L ${x} ${prevY} L ${x} ${y}`;
+      }
+    }
+    
+    // Extender la línea hasta el borde derecho
+    const lastPoint = points[points.length - 1];
+    const lastY = getY(lastPoint.state);
+    const endX = width - padding;
+    path += ` L ${endX} ${lastY}`;
+    
+    return path;
+  });
+
+  // Genera el path del relleno bajo la señal
+  public readonly svgFillPath = computed(() => {
+    const path = this.svgPath();
+    if (!path) {
+      return '';
+    }
+    
+    const width = 300;
+    const height = 80;
+    const padding = 10;
+    const bottomY = height - padding - 10;
+    const firstX = padding;
+    const endX = width - padding;
+    
+    return `M ${firstX} ${bottomY} L ${path.substring(2)} L ${endX} ${bottomY} Z`;
+  });
 
   constructor() {
     // Efecto reactivo para mantener sincronizados los dropdowns si hay conexión o cambios guardados en el servidor
@@ -64,6 +132,13 @@ export class App implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loadPorts();
     this.initializeTheme();
+    this.startChartLogging();
+  }
+
+  ngOnDestroy() {
+    if (this.chartIntervalId) {
+      clearInterval(this.chartIntervalId);
+    }
   }
 
   // Inicializa el tema leyendo del localStorage
@@ -192,5 +267,43 @@ export class App implements OnInit, AfterViewInit {
     if (typeof Prism !== 'undefined') {
       Prism.highlightAll();
     }
+  }
+
+  private startChartLogging() {
+    // Inicializar con el estado actual
+    const now = Date.now();
+    const initialState = this.serialService.ledState() ? 1 : 0;
+    this.chartPoints.set([{ time: now, state: initialState }]);
+
+    // Registrar el estado cada 200 ms
+    this.chartIntervalId = setInterval(() => {
+      const currentTime = Date.now();
+      const currentState = this.serialService.ledState() ? 1 : 0;
+      
+      this.chartPoints.update(points => {
+        let newPoints = [...points];
+        
+        if (newPoints.length > 0) {
+          const lastPoint = newPoints[newPoints.length - 1];
+          if (lastPoint.state !== currentState) {
+            // Añadir un punto de transición brusca justo antes del cambio
+            newPoints.push({ time: currentTime - 1, state: lastPoint.state });
+          }
+        }
+        
+        newPoints.push({ time: currentTime, state: currentState });
+        
+        // Mantener solo los últimos 15 segundos
+        const cutOff = currentTime - 15000;
+        newPoints = newPoints.filter(p => p.time >= cutOff);
+        
+        // Conservar al menos el último punto si todos fueron filtrados
+        if (newPoints.length === 0 && points.length > 0) {
+          newPoints.push(points[points.length - 1]);
+        }
+        
+        return newPoints;
+      });
+    }, 200);
   }
 }
