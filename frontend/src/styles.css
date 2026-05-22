@@ -175,20 +175,29 @@ body {
     
     #card-connection { 
         grid-area: conn; 
-        height: auto;
-        align-self: start;
+        height: 100%;
     }
     #card-terminal { 
         grid-area: terminal; 
-        height: 410px;
+        height: 100%;
+        position: relative;
     }
     #card-terminal .terminal-body {
-        min-height: 0;
+        position: absolute;
+        top: 65px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
     }
     #card-terminal .terminal {
+        flex: 1;
         min-height: 0;
-        height: auto;
+        height: 0;
         max-height: none;
+        overflow-y: auto;
     }
     #card-led { grid-area: control; align-self: start; }
     #card-code { grid-area: code; }
