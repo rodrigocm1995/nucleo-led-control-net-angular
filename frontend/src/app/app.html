@@ -183,7 +183,13 @@
       <div class="card-header">
         <div class="card-icon console-icon"></div>
         <h2 id="term-heading">Consola de logs de Servidor</h2>
-        <button (click)="onClearConsole()" class="btn-clear">Limpiar</button>
+        <button (click)="onClearConsole()" class="btn-clear-console">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="clear-icon">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Limpiar
+        </button>
       </div>
       <div class="terminal-body">
         <div class="terminal" #serialTerminal>
@@ -207,59 +213,320 @@
       
       <div class="card-body code-body">
         <div class="code-container">
-          <pre class="language-c"><code class="language-c">/* USER CODE BEGIN Header */
+          <pre ngNonBindable class="language-c"><code class="language-c">/* USER CODE BEGIN Header */
 /**
+  ******************************************************************************
   * @file           : main.c
-  * @brief          : Control de LED por comandos serie UART2 (PA5)
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
   ******************************************************************************
   */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32f303xe.h"
 #include "stm32f3xx_hal.h"
+#include "stm32f3xx_hal_def.h"
+#include "stm32f3xx_hal_gpio.h"
+#include "stm32f3xx_hal_uart.h"
 #include &lt;stdio.h&gt;
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
+/* USER CODE END Includes */
 
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
-uint8_t userInput = 0;
-char tx_data[50];
 
+/* USER CODE BEGIN PV */
+uint8_t userInput = 0;
+uint8_t buffer[1];
+char tx_data[50];
+//uint8_t msg[50];
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
+/* USER CODE BEGIN PFP */
+char readUserInput(void);
+uint8_t processUserInput(char userInput);
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 &#123;
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  /* USER CODE BEGIN 2 */
 
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   &#123;
-    // Leer carácter del puerto serie por polling
-    if (HAL_UART_Receive(&amp;huart2, &amp;userInput, 1, 100) == HAL_OK)
-    &#123;
-      switch(userInput)
-      &#123;
-        case '0': // Apagar LED
-          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-          sprintf(tx_data, "LED Apagado\r\n");
-          HAL_UART_Transmit(&amp;huart2, (uint8_t *)tx_data, strlen(tx_data), 100);
-          break;
-        case '1': // Enciende LED
-          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-          sprintf(tx_data, "LED Encendido\r\n");
-          HAL_UART_Transmit(&amp;huart2, (uint8_t *)tx_data, strlen(tx_data), 100);
-          break;
-        case '?': // Consultar Estado
-          if ((GPIOA-&gt;ODR &amp; GPIO_PIN_5) != 0) &#123;
-            sprintf(tx_data, "LED Encendido\r\n");
-          &#125; else &#123;
-            sprintf(tx_data, "LED Apagado\r\n");
-          &#125;
-          HAL_UART_Transmit(&amp;huart2, (uint8_t *)tx_data, strlen(tx_data), 100);
-          break;
-      &#125;
-    &#125;
-    HAL_Delay(1);
+	  userInput = readUserInput();
+	  processUserInput(userInput);
+	  HAL_Delay(1);
+
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  &#125;
+  /* USER CODE END 3 */
+&#125;
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+&#123;
+  RCC_OscInitTypeDef RCC_OscInitStruct = &#123;0&#125;;
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = &#123;0&#125;;
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = &#123;0&#125;;
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
+  if (HAL_RCC_OscConfig(&amp;RCC_OscInitStruct) != HAL_OK)
+  &#123;
+    Error_Handler();
+  &#125;
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&amp;RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  &#123;
+    Error_Handler();
+  &#125;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  if (HAL_RCCEx_PeriphCLKConfig(&amp;PeriphClkInit) != HAL_OK)
+  &#123;
+    Error_Handler();
   &#125;
 &#125;
-          </code></pre>
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+&#123;
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&amp;huart2) != HAL_OK)
+  &#123;
+    Error_Handler();
+  &#125;
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+&#125;
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+&#123;
+  GPIO_InitTypeDef GPIO_InitStruct = &#123;0&#125;;
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+
+  /* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(B1_GPIO_Port, &amp;GPIO_InitStruct);
+
+  /*Configure GPIO pin : LD2_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LD2_GPIO_Port, &amp;GPIO_InitStruct);
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+
+  /* USER CODE END MX_GPIO_Init_2 */
+&#125;
+
+/* USER CODE BEGIN 4 */
+char readUserInput(void)
+&#123;
+	char readBuf[1];
+
+	HAL_UART_Receive(&amp;huart2, (uint8_t *)readBuf, 1, 100);
+	//uint8_t result = atoi(readBuf);
+	//sprintf(result_arr, "Result = %d\r\n", result);
+	//HAL_UART_Transmit(&amp;huart2, (uint8_t *)result_arr, strlen(result_arr), 100);
+	return readBuf[0];
+&#125;
+
+uint8_t processUserInput(char userInput)
+&#123;
+	//sprintf(msg, "%d", userInput);
+
+	switch(userInput)
+	&#123;
+	case '0':
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		sprintf(tx_data, "LED Apagado\r\n");
+		HAL_UART_Transmit(&amp;huart2, (uint8_t *)tx_data, strlen(tx_data), 100);
+		break;
+	case '1':
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		sprintf(tx_data, "LED Encendido\r\n");
+		HAL_UART_Transmit(&amp;huart2, (uint8_t *)tx_data, strlen(tx_data), 100);
+		break;
+	case '?':
+		if ((GPIOA-&gt;ODR &amp; GPIO_PIN_5) != 0)&#123;
+			sprintf(tx_data, "LED Encendido\r\n");
+			HAL_UART_Transmit(&amp;huart2, (uint8_t *)tx_data, strlen(tx_data), 100);
+		&#125;else &#123;
+			sprintf(tx_data, "LED Apagado\r\n");
+			HAL_UART_Transmit(&amp;huart2, (uint8_t *)tx_data, strlen(tx_data), 100);
+		&#125;
+	&#125;
+
+	return 1;
+&#125;
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+&#123;
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  &#123;
+  &#125;
+  /* USER CODE END Error_Handler_Debug */
+&#125;
+#ifdef USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+&#123;
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+&#125;
+#endif /* USE_FULL_ASSERT */</code></pre>
         </div>
       </div>
     </section>

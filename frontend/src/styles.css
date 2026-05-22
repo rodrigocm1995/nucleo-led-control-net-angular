@@ -591,20 +591,108 @@ input:disabled + .slider {
 
 .btn-clear {
     margin-left: auto;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--card-border);
     color: var(--text-secondary);
     font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    letter-spacing: 0.3px;
 }
 
 .btn-clear:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary);
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: var(--accent-warning);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-clear:active {
+    transform: translateY(0);
+}
+
+.btn-clear .clear-icon {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+}
+
+.btn-clear:hover .clear-icon {
+    transform: rotate(15deg) scale(1.1);
+}
+
+body.light-mode .btn-clear {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .btn-clear:hover {
+    background: rgba(217, 119, 6, 0.06);
+    border-color: rgba(217, 119, 6, 0.25);
+    color: var(--accent-warning);
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.08);
+}
+
+/* Specific console clear button with refined glassmorphic amber styling */
+.btn-clear-console {
+    margin-left: auto;
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: rgba(245, 158, 11, 0.85);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    letter-spacing: 0.3px;
+}
+
+.btn-clear-console:hover {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.55);
+    color: #fbbf24;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-clear-console:active {
+    transform: translateY(0);
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.15);
+}
+
+.btn-clear-console .clear-icon {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-clear-console:hover .clear-icon {
+    transform: scale(1.15) rotate(-15deg);
+}
+
+/* Light mode overrides for console clear button */
+body.light-mode .btn-clear-console {
+    background: rgba(217, 119, 6, 0.06);
+    border-color: rgba(217, 119, 6, 0.25);
+    color: #d97706;
+}
+
+body.light-mode .btn-clear-console:hover {
+    background: rgba(217, 119, 6, 0.14);
+    border-color: rgba(217, 119, 6, 0.45);
+    color: #b45309;
+    box-shadow: 0 4px 10px rgba(217, 119, 6, 0.18);
 }
 
 .terminal-body {
