@@ -1,0 +1,1113 @@
+/* ==========================================================================
+   STM32 Nucleo LED Controller - Stylesheet (style.css)
+   Design System: Glassmorphism / Modern Tech / Dark Mode
+   ========================================================================== */
+
+:root {
+    /* Colors */
+    --bg-color: #0b0f19;
+    --card-bg: rgba(17, 25, 40, 0.55);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-shadow: rgba(0, 0, 0, 0.35);
+    
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    
+    --accent-cyan: #00f2fe;
+    --accent-blue: #0072ff;
+    --accent-green: #10b981;
+    --accent-green-glow: #00ff88;
+    --accent-red: #ef4444;
+    --accent-warning: #f59e0b;
+    
+    --terminal-bg: rgba(7, 10, 19, 0.8);
+    --terminal-border: rgba(0, 242, 254, 0.15);
+
+    /* Fonts */
+    --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* Layout */
+    --border-radius: 16px;
+    --transition-speed: 0.3s;
+}
+
+/* Reset & Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Decorative background glowing circles */
+.glass-bg-decor {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(140px);
+    z-index: -1;
+    opacity: 0.4;
+}
+
+.decor-1 {
+    top: 10%;
+    left: 15%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+}
+
+.decor-2 {
+    bottom: 15%;
+    right: 15%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--accent-green-glow) 0%, var(--accent-blue) 100%);
+}
+
+/* App Layout Container */
+.app-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem 1.5rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+}
+
+/* Warning Banner */
+.warning-banner {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.warning-icon {
+    font-size: 1.5rem;
+}
+
+.warning-text {
+    font-size: 0.95rem;
+    color: #fca5a5;
+}
+
+.warning-text em {
+    text-decoration: underline;
+    font-style: normal;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Header */
+.app-header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    color: var(--accent-cyan);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+}
+
+.app-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+}
+
+@media (min-width: 850px) {
+    .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+            "conn terminal"
+            "control code";
+    }
+    
+    #card-connection { 
+        grid-area: conn; 
+        height: auto;
+        align-self: start;
+    }
+    #card-terminal { 
+        grid-area: terminal; 
+        height: 410px;
+    }
+    #card-terminal .terminal-body {
+        min-height: 0;
+    }
+    #card-terminal .terminal {
+        min-height: 0;
+        height: auto;
+        max-height: none;
+    }
+    #card-led { grid-area: control; align-self: start; }
+    #card-code { grid-area: code; }
+}
+
+.panel-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0; /* Previene el desbordamiento horizontal debido al bloque de código pre */
+}
+
+/* Card Styling (Glassmorphism) */
+.glass-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 32px 0 var(--card-shadow);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    overflow: hidden;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.glass-card:hover {
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45), 0 0 15px rgba(0, 242, 254, 0.03);
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Icons (Decorative dots) */
+.card-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.connection-icon { background-color: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
+.led-icon { background-color: var(--accent-green-glow); box-shadow: 0 0 8px var(--accent-green-glow); }
+.console-icon { background-color: var(--accent-warning); box-shadow: 0 0 8px var(--accent-warning); }
+.code-title-icon { background-color: #a855f7; box-shadow: 0 0 8px #a855f7; }
+
+.card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Connection status badge */
+.status-indicator-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.status-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.status-badge.disconnected {
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-badge.connected {
+    background: rgba(16, 185, 129, 0.12);
+    color: #a7f3d0;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.disconnected .status-dot {
+    background-color: var(--accent-red);
+    box-shadow: 0 0 6px var(--accent-red);
+    animation: pulseRed 1.8s infinite;
+}
+
+.connected .status-dot {
+    background-color: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green-glow);
+    animation: pulseGreen 1.5s infinite;
+}
+
+/* Form inputs & selections */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.custom-select {
+    background: rgba(17, 25, 40, 0.8);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-select:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+}
+
+/* Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn-icon-svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.btn-connect {
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+    border: none;
+    color: #040815;
+    box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);
+}
+
+.btn-connect:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+}
+
+.btn-connect:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-disconnect {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+.btn-disconnect:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: var(--accent-red);
+}
+
+.btn-disconnect:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-sync {
+    background: rgba(0, 242, 254, 0.08);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    color: var(--accent-cyan);
+}
+
+.btn-sync:hover:not(:disabled) {
+    background: rgba(0, 242, 254, 0.15);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+}
+
+.btn-sync:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* LED Control Layout */
+.control-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2.25rem 1.5rem;
+}
+
+.led-visual-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Virtual LED component */
+.led-light {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #374151 0%, #111827 70%, #030712 100%);
+    border: 4px solid #1f2937;
+    position: relative;
+    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.05), 
+                0 4px 8px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.led-inner-glow {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background: radial-gradient(circle at 30% 30%, #ff8888 0%, var(--accent-red) 50%, #7f1d1d 100%);
+}
+
+/* Active LED state */
+.led-light.active {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.6), 
+                0 0 50px rgba(239, 68, 68, 0.3),
+                inset 0 2px 2px rgba(255, 255, 255, 0.2);
+    animation: activeLedPulse 2s infinite ease-in-out;
+}
+
+.led-light.active .led-inner-glow {
+    opacity: 1;
+}
+
+.led-state-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.led-light.active + .led-state-label {
+    color: #f87171;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Toggle Switch Control */
+.toggle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.9rem 1.2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.toggle-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 32px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #374151;
+    transition: .3s;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #9ca3af;
+    transition: .3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+input:checked + .slider {
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+}
+
+input:checked + .slider:before {
+    transform: translateX(28px);
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+input:disabled + .slider {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Terminal Console Panel */
+.terminal-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-clear {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-clear:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.terminal-body {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.terminal {
+    background: var(--terminal-bg);
+    border: 1px solid var(--terminal-border);
+    border-radius: 8px;
+    flex: 1;
+    min-height: 180px;
+    height: 250px;
+    max-height: 250px;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    scroll-behavior: smooth;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+    
+    /* Standard scrollbar for Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 242, 254, 0.35) rgba(0, 0, 0, 0.25);
+}
+
+.terminal-line {
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.system-msg { color: #60a5fa; }
+.tx-msg { color: var(--accent-cyan); }
+.rx-msg { color: var(--accent-green-glow); }
+.error-msg { color: var(--accent-red); }
+
+/* Terminal custom scrollbar */
+.terminal::-webkit-scrollbar {
+    width: 8px;
+}
+.terminal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
+.terminal::-webkit-scrollbar-thumb {
+    background: rgba(0, 242, 254, 0.35);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.terminal::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 242, 254, 0.65);
+}
+
+/* Code Examples Card */
+.code-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+}
+
+.code-container pre,
+.code-container pre[class*="language-"] {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0;
+    overflow-x: auto;
+    max-height: 380px;
+}
+
+.code-container pre::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+.code-container pre::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+.code-container pre::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+.code-container pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.code-container code,
+.code-container code[class*="language-"] {
+    font-family: var(--font-mono) !important;
+    font-size: 0.8rem !important;
+    color: #f8fafc !important;
+    display: block;
+    line-height: 1.5;
+}
+
+/* Custom Code Syntax Highlight Colors (Dark Mode / Night Mode) */
+.code-container .token.comment,
+.code-container .token.prolog,
+.code-container .token.doctype,
+.code-container .token.cdata {
+    color: #64748b !important; /* Muted slate gray for comments */
+    font-style: italic;
+}
+.code-container .token.punctuation {
+    color: #94a3b8 !important; /* Brackets, semicolons */
+}
+.code-container .token.keyword {
+    color: #f472b6 !important; /* Rose pink for while, void, switch, case, main */
+    font-weight: 600;
+}
+.code-container .token.function {
+    color: #38bdf8 !important; /* Sky blue for functions like HAL_UART_Receive */
+}
+.code-container .token.property,
+.code-container .token.tag,
+.code-container .token.boolean,
+.code-container .token.number,
+.code-container .token.constant,
+.code-container .token.symbol,
+.code-container .token.deleted {
+    color: #fb923c !important; /* Orange for numbers, pins, and constants */
+}
+.code-container .token.string,
+.code-container .token.char,
+.code-container .token.builtin,
+.code-container .token.inserted {
+    color: #4ade80 !important; /* Green for strings and chars */
+}
+.code-container .token.operator,
+.code-container .token.entity,
+.code-container .token.url {
+    color: #38bdf8 !important; /* Cyan for operators like ==, &, !=, = */
+}
+.code-container .token.directive,
+.code-container .token.macro {
+    color: #c084fc !important; /* Purple for preprocessor directives like #include */
+}
+
+/* Footer styling */
+.app-footer {
+    text-align: center;
+    padding: 1.5rem 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--card-border);
+    margin-top: 1rem;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@keyframes pulseGreen {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes activeLedPulse {
+    0% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.2); }
+    50% { box-shadow: 0 0 35px rgba(239, 68, 68, 0.85), inset 0 2px 2px rgba(255, 255, 255, 0.3); }
+    100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.2); }
+}
+
+/* ==========================================================================
+   Responsive Design Enhancements (Mobile Devices)
+   ========================================================================== */
+@media (max-width: 600px) {
+    .app-container {
+        padding: 1rem 0.75rem;
+        gap: 1rem;
+    }
+    
+    .app-header {
+        margin-bottom: 0.25rem;
+    }
+    
+    .app-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 0.95rem;
+        padding: 0 0.5rem;
+    }
+    
+    .card-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .control-body {
+        padding: 1.75rem 1rem;
+        gap: 1.5rem;
+    }
+    
+    .led-light {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .toggle-container {
+        padding: 0.75rem 1rem;
+    }
+    
+    .terminal {
+        height: 160px;
+        max-height: 160px;
+        font-size: 0.8rem;
+    }
+    
+    .code-container pre,
+    .code-container pre[class*="language-"] {
+        padding: 0.75rem;
+        max-height: 280px;
+    }
+    
+    .code-container code,
+    .code-container code[class*="language-"] {
+        font-size: 0.75rem !important;
+    }
+}
+
+/* ==========================================================================
+   Theme Toggle & Day/Night Mode Styling
+   ========================================================================== */
+
+/* Theme Toggle Button Container */
+.theme-toggle {
+    position: absolute;
+    top: 2rem;
+    right: 1.5rem;
+    z-index: 100;
+}
+
+/* Glassmorphic Rounded Button */
+.theme-toggle-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 4px 12px var(--card-shadow);
+    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1) rotate(15deg);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.theme-icon {
+    transition: transform 0.3s ease;
+}
+
+/* Day Mode (Light Theme) Overrides */
+body.light-mode {
+    --bg-color: #f3f4f6;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --card-shadow: rgba(31, 41, 55, 0.08);
+    
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    
+    --accent-cyan: #0d9488; /* Teal for high contrast in light mode */
+    --accent-blue: #2563eb;
+    --accent-green: #059669;
+    --accent-green-glow: #10b981;
+    --accent-red: #dc2626;
+    --accent-warning: #d97706;
+    
+    --terminal-bg: rgba(249, 250, 251, 0.95);
+    --terminal-border: rgba(13, 148, 136, 0.25);
+}
+
+/* Soften background decorative elements in day mode */
+body.light-mode .glass-bg-decor {
+    opacity: 0.15;
+}
+
+/* Ensure the main title is readable on light background */
+body.light-mode .app-header h1 {
+    background: linear-gradient(135deg, #111827 30%, var(--accent-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Soft white background for custom select inputs in day mode */
+body.light-mode .custom-select {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Light theme for the checkbox toggle slider */
+body.light-mode .slider {
+    background-color: #d1d5db;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .slider:before {
+    background-color: #ffffff;
+}
+
+/* Light container boxes inside cards */
+body.light-mode .toggle-container,
+body.light-mode .status-indicator-wrapper {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Custom color styles for action buttons in light mode */
+body.light-mode .btn-connect {
+    background: linear-gradient(135deg, #0d9488 0%, #2563eb 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    border: none;
+}
+body.light-mode .btn-connect:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+}
+
+body.light-mode .btn-disconnect {
+    background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+    border: none;
+}
+body.light-mode .btn-disconnect:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    box-shadow: 0 6px 15px rgba(220, 38, 38, 0.35);
+}
+
+body.light-mode .btn-sync {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+    border: none;
+}
+body.light-mode .btn-sync:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+    box-shadow: 0 6px 15px rgba(217, 119, 6, 0.35);
+}
+
+/* Readable status badges in light mode */
+body.light-mode .status-badge.disconnected {
+    background: rgba(239, 68, 68, 0.08);
+    color: #b91c1c;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+body.light-mode .status-badge.connected {
+    background: rgba(16, 185, 129, 0.08);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Readable warning banner in light mode */
+body.light-mode .warning-banner {
+    background: rgba(220, 38, 38, 0.06);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+body.light-mode .warning-text {
+    color: #991b1b;
+}
+
+/* Terminal Console Light Mode Colors (High Contrast) */
+body.light-mode .system-msg { color: #4b5563; } /* Gris pizarra para avisos del sistema */
+body.light-mode .tx-msg { color: #2563eb; }     /* Azul brillante para datos enviados (TX) */
+body.light-mode .rx-msg { color: #16a34a; }     /* Verde esmeralda para datos recibidos (RX) */
+body.light-mode .error-msg { color: #dc2626; }  /* Rojo para errores */
+
+body.light-mode .terminal {
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+    scrollbar-color: rgba(13, 148, 136, 0.35) rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .terminal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .terminal::-webkit-scrollbar-thumb {
+    background: rgba(13, 148, 136, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+body.light-mode .terminal::-webkit-scrollbar-thumb:hover {
+    background: rgba(13, 148, 136, 0.65);
+}
+
+/* Responsive adjustments for theme toggle button */
+@media (max-width: 600px) {
+    .theme-toggle {
+        top: 1rem;
+        right: 0.75rem;
+    }
+}
+
+/* ==========================================================================
+   Day Mode (Light Theme) Overrides for Code Syntax Highlighting
+   ========================================================================== */
+body.light-mode .code-container pre,
+body.light-mode .code-container pre[class*="language-"] {
+    background: rgba(243, 244, 246, 0.85) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .code-container code,
+body.light-mode .code-container code[class*="language-"] {
+    color: #1f2937 !important;
+}
+
+body.light-mode .code-container .token.comment,
+body.light-mode .code-container .token.prolog,
+body.light-mode .code-container .token.doctype,
+body.light-mode .code-container .token.cdata {
+    color: #8b949e !important;
+    font-style: italic;
+}
+
+body.light-mode .code-container .token.punctuation {
+    color: #4b5563 !important;
+}
+
+body.light-mode .code-container .token.property,
+body.light-mode .code-container .token.tag,
+body.light-mode .code-container .token.boolean,
+body.light-mode .code-container .token.number,
+body.light-mode .code-container .token.constant,
+body.light-mode .code-container .token.symbol,
+body.light-mode .code-container .token.deleted {
+    color: #ea580c !important;
+}
+
+body.light-mode .code-container .token.selector,
+body.light-mode .code-container .token.attr-name,
+body.light-mode .code-container .token.string,
+body.light-mode .code-container .token.char,
+body.light-mode .code-container .token.builtin,
+body.light-mode .code-container .token.inserted {
+    color: #16a34a !important;
+}
+
+body.light-mode .code-container .token.operator,
+body.light-mode .code-container .token.entity,
+body.light-mode .code-container .token.url {
+    color: #0284c7 !important;
+}
+
+body.light-mode .code-container .token.keyword {
+    color: #7c3aed !important;
+    font-weight: 600;
+}
+
+body.light-mode .code-container .token.function {
+    color: #2563eb !important;
+}
+
+body.light-mode .code-container .token.class-name {
+    color: #db2777 !important;
+}
+
+body.light-mode .code-container .token.regex,
+body.light-mode .code-container .token.important,
+body.light-mode .code-container .token.variable {
+    color: #d97706 !important;
+}
+
+body.light-mode .code-container .token.directive,
+body.light-mode .code-container .token.macro {
+    color: #be185d !important;
+}

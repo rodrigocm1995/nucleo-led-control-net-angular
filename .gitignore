@@ -1,0 +1,35 @@
+# ==========================================
+# Root .gitignore for C# & Angular Project
+# ==========================================
+
+# --- Frontend (Angular / Node) ---
+frontend/node_modules/
+frontend/dist/
+frontend/tmp/
+frontend/out-tsc/
+frontend/.angular/
+frontend/npm-debug.log
+frontend/yarn-error.log
+frontend/.history/
+frontend/.sass-cache/
+frontend/connect.lock
+frontend/coverage/
+
+# --- Backend (C# / .NET) ---
+backend/bin/
+backend/obj/
+backend/serial-settings.json
+backend/appsettings.Development.json
+*.user
+
+# --- IDEs and Editors ---
+.idea/
+.vscode/
+*.suo
+*.user
+*.userossc
+*.sln.docstates
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
